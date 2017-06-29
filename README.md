@@ -3,8 +3,10 @@
 I've had a hard time getting a starting boilerplate that had an express based server with react on it's front-end.  Combining 2 very useful git's, I've created one that uses Gulp to build and run Express with Reach and Redux on it's front end.
 
 The 2 Gits I combined for this boiler plate are
-[react-boilerplate by robertklep](https://github.com/robertklep/react-boilerplate)
-[redux-minimal by catalin-luntraru](https://redux-minimal.js.org/)
+
+* [react-boilerplate by robertklep](https://github.com/robertklep/react-boilerplate)
+* [redux-minimal by catalin-luntraru](https://redux-minimal.js.org/)
+
 Thanks so much for this work!
 
 Simple React.js app boilerplate, using the following:
