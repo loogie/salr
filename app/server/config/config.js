@@ -6,23 +6,26 @@ let config = {
   development: {
     root: rootPath,
     app: {
-      name: 'app-name'
+      name: 'salr'
     },
     port: process.env.PORT || 3000,
+    db: {db:'salr_development'}
   },
   test: {
     root: rootPath,
     app: {
-      name: 'app-name'
+      name: 'salr'
     },
     port: process.env.PORT || 3000,
+    db: {db:'salr_test'}
   },
   production: {
     root: rootPath,
     app: {
-      name: 'app-name'
+      name: 'salr'
     },
     port: process.env.PORT || 3000,
+    db: {db:'salr_production'}
   }
 }
 

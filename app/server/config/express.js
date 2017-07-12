@@ -9,6 +9,14 @@ const compress = require('compression');
 const methodOverride = require('method-override');
 const nunjucks = require('nunjucks');
 
+const passport = require('passport');
+const flash = require('connect-flash');
+
+const session = require('express-session');
+const FileStore = require('session-file-store')(session);
+
+require('./passport')(passport);
+
 module.exports = function(app, config) {
   var env = process.env.NODE_ENV || 'development';
   app.locals.ENV = env;
@@ -31,6 +39,16 @@ module.exports = function(app, config) {
   app.use(compress());
   app.use(express.static(config.root + '/static'));
   app.use(methodOverride());
+
+  app.use(session({
+    store: new FileStore(),
+    secret: "sexy keyboard cat",
+    resave: true,
+    saveUninitialized: false
+  }));
+  app.use(passport.initialize());
+  app.use(passport.session());
+  app.use(flash());
 
   app.set('trust proxy', 1);
 

@@ -5,9 +5,9 @@ const Promise = require('bluebird');
 
 module.exports = function (app) {
   app.use('/api', apiRouter);
-  app.use('/', router);
+  app.use('/*', router);
 };
 
-router.get('/', (req, res)=>{
-  res.render('index', {title:"Test Title"});
+router.get('/*', (req, res)=>{
+  res.render('index', {title:"Salr"});
 });
