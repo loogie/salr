@@ -7,7 +7,7 @@ var thinky = require('../config/thinky'),
 
 var User = thinky.createModel('User', {
   id: type.string().default(r.uuid()),
-  name: type.string(),
+  displayName: type.string(),
   local: {
     name: type.string(),
     pwd: type.string(),

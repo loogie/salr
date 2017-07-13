@@ -1,6 +1,6 @@
 import React from "react";
 import {connect} from "react-redux";
-import {Link} from "react-router-dom";
+import {Redirect, Link} from "react-router-dom";
 
 // Home page component
 class Signup extends React.Component {
@@ -23,9 +23,19 @@ class Signup extends React.Component {
 
   // render
   render() {
+    let userRedirect = null;
+    if (this.props.user.id){
+      userRedirect = (<Redirect to="/" />)
+    }
+
+    console.log("USER");
+    console.log(this.props.user);
+    console.log(userRedirect);
+
     return (
       <div className="center-pg pg-limit-lg flex-col">
         <h4>Create New User</h4>
+        {userRedirect}
         <div className="mdl-textfield mdl-js-textfield fill">
           <input className="mdl-textfield__input" type="text" id="txtName" onChange={(e)=>this.onChange('username', e.target.value)} value={this.state.username} />
           <label className="mdl-textfield__label" htmlFor="txtName">Username...</label>
@@ -44,4 +54,16 @@ class Signup extends React.Component {
   }
 }
 
-export default connect()(Signup);
+const mapStateToProps = (state)=>{
+  return {
+    user: state.user
+  }
+}
+
+const mapDispatchToProps = (dispatch)=>{
+  return {
+    dispatch
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Signup);

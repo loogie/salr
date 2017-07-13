@@ -44,7 +44,7 @@ module.exports = function(passport){
 
         console.log("CREATING NEW USER");
         let newUser = new User({
-          name: username,
+          displayName: username,
           local: {
             name: username,
             pwd: generateHash(pass),
