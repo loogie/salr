@@ -78,10 +78,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Home = function (_React$Component) {
   _inherits(Home, _React$Component);
 
-  function Home() {
+  function Home(props) {
     _classCallCheck(this, Home);
 
-    return _possibleConstructorReturn(this, (Home.__proto__ || Object.getPrototypeOf(Home)).apply(this, arguments));
+    var _this = _possibleConstructorReturn(this, (Home.__proto__ || Object.getPrototypeOf(Home)).call(this, props));
+
+    var sessionUser = document.getElementById("sessionUser");
+    if (sessionUser) {
+      _this.props.dispatch({ type: "USER_SESSION", userid: sessionUser.value });
+    }
+    return _this;
   }
 
   _createClass(Home, [{
@@ -101,31 +107,31 @@ var Home = function (_React$Component) {
       if (this.props.user.id) {
         userDiv = _react2.default.createElement(
           "div",
-          { className: "flex-row" },
+          { className: "flex-row", style: { "alignItems": "stretch", "justifyContent": "center" } },
           _react2.default.createElement(
             _reactRouterDom.Link,
             { to: "/profile" },
             this.props.user.displayName
           ),
-          "|",
+          "\xA0|\xA0",
           _react2.default.createElement(
-            "button",
-            { className: "mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised mdl-button--colored", onClick: function onClick() {
+            "a",
+            { href: "", onClick: function onClick() {
                 return _this2.logout();
               } },
-            "Logout"
+            "Sign\xA0Out"
           )
         );
       } else {
         userDiv = _react2.default.createElement(
           "div",
-          { className: "flex-row" },
+          { className: "flex-row", style: { "alignItems": "stretch", "justifyContent": "center" } },
           _react2.default.createElement(
             _reactRouterDom.Link,
             { to: "/login" },
             "Login"
           ),
-          "|",
+          "\xA0|\xA0",
           _react2.default.createElement(
             _reactRouterDom.Link,
             { to: "/signup" },
@@ -643,7 +649,7 @@ var _store = require("../store");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _marked = [userSagas, attemptSignup, attemptLogin, logout].map(regeneratorRuntime.mark);
+var _marked = [userSagas, sessionLogin, attemptLogin, attemptSignup, logout].map(regeneratorRuntime.mark);
 
 // main Map saga generators
 function userSagas() {
@@ -652,17 +658,21 @@ function userSagas() {
       switch (_context.prev = _context.next) {
         case 0:
           _context.next = 2;
-          return (0, _effects.takeEvery)("USER_LOGIN", attemptLogin);
+          return (0, _effects.takeEvery)("USER_SESSION", sessionLogin);
 
         case 2:
           _context.next = 4;
-          return (0, _effects.takeEvery)("USER_SIGNUP", attemptSignup);
+          return (0, _effects.takeEvery)("USER_LOGIN", attemptLogin);
 
         case 4:
           _context.next = 6;
-          return (0, _effects.takeEvery)("USER_LOGOUT", logout);
+          return (0, _effects.takeEvery)("USER_SIGNUP", attemptSignup);
 
         case 6:
+          _context.next = 8;
+          return (0, _effects.takeEvery)("USER_LOGOUT", logout);
+
+        case 8:
         case "end":
           return _context.stop();
       }
@@ -670,14 +680,29 @@ function userSagas() {
   }, _marked[0], this);
 }
 
-function attemptSignup(action) {
-  return regeneratorRuntime.wrap(function attemptSignup$(_context2) {
+function sessionLogin(action) {
+  return regeneratorRuntime.wrap(function sessionLogin$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
         case 0:
           _context2.prev = 0;
           _context2.next = 3;
-          return (0, _effects.call)(signup, action);
+          return (0, _effects.call)(function (action) {
+            (0, _isomorphicFetch2.default)('/api/auth/session/' + action.userid, { method: "POST", credentials: 'include' }).then(function (response) {
+              if (response.status >= 400) {
+                console.log("ERROR");
+                console.log(response);
+                _store.store.dispatch({ type: "ERROR", error: response, from: action.type });
+              }
+              return response.json();
+            }).then(function (json) {
+              if (json.user) {
+                _store.store.dispatch({ type: "USER_CONN", user: json.user });
+              } else if (json.error) {
+                _store.store.dispatch({ type: "ERROR", error: json.error, from: action.type });
+              }
+            });
+          }, action);
 
         case 3:
           _context2.next = 9;
@@ -724,18 +749,14 @@ function attemptLogin(action) {
   }, _marked[2], this, [[0, 5]]);
 }
 
-function logout(action) {
-  return regeneratorRuntime.wrap(function logout$(_context4) {
+function attemptSignup(action) {
+  return regeneratorRuntime.wrap(function attemptSignup$(_context4) {
     while (1) {
       switch (_context4.prev = _context4.next) {
         case 0:
           _context4.prev = 0;
           _context4.next = 3;
-          return (0, _effects.call)(function (action) {
-            console.log("LOGOUT");
-            (0, _isomorphicFetch2.default)('/api/logout', { method: "POST" });
-            _store.store.dispatch({ type: "USER_CLEAR" });
-          }, action);
+          return (0, _effects.call)(signup, action);
 
         case 3:
           _context4.next = 9;
@@ -755,12 +776,43 @@ function logout(action) {
   }, _marked[3], this, [[0, 5]]);
 }
 
+function logout(action) {
+  return regeneratorRuntime.wrap(function logout$(_context5) {
+    while (1) {
+      switch (_context5.prev = _context5.next) {
+        case 0:
+          _context5.prev = 0;
+          _context5.next = 3;
+          return (0, _effects.call)(function (action) {
+            console.log("LOGOUT");
+            (0, _isomorphicFetch2.default)('/api/logout', { method: "POST" });
+            _store.store.dispatch({ type: "USER_CLEAR" });
+          }, action);
+
+        case 3:
+          _context5.next = 9;
+          break;
+
+        case 5:
+          _context5.prev = 5;
+          _context5.t0 = _context5["catch"](0);
+          _context5.next = 9;
+          return (0, _effects.put)({ type: "ERROR", error: _context5.t0, from: action.type });
+
+        case 9:
+        case "end":
+          return _context5.stop();
+      }
+    }
+  }, _marked[4], this, [[0, 5]]);
+}
+
 function signup(action) {
   var payload = JSON.stringify(action.user);
   console.log("POSTING PAYLOAD");
   console.log(payload);
 
-  (0, _isomorphicFetch2.default)('/api/signup', { method: "POST", body: payload, headers: { "Content-Type": "application/json" } }).then(function (response) {
+  (0, _isomorphicFetch2.default)('/api/signup', { method: "POST", body: payload, credentials: 'include', headers: { "Content-Type": "application/json" } }).then(function (response) {
     if (response.status >= 400) {
       console.log("ERROR");
       console.log(response);
@@ -781,7 +833,7 @@ function login(action) {
   console.log("POSTING PAYLOAD");
   console.log(payload);
 
-  (0, _isomorphicFetch2.default)('/api/auth/local', { method: "POST", body: payload, headers: { "Content-Type": "application/json" } }).then(function (response) {
+  (0, _isomorphicFetch2.default)('/api/auth/local', { method: "POST", body: payload, credentials: 'include', headers: { "Content-Type": "application/json" } }).then(function (response) {
     if (response.status >= 400) {
       console.log("ERROR");
       console.log(response);
@@ -792,6 +844,8 @@ function login(action) {
     if (json.user) {
       _store.store.dispatch({ type: "USER_CONN", user: json.user });
     } else if (json.error) {
+      console.log("ERROR");
+      console.log(json);
       _store.store.dispatch({ type: "ERROR", error: json.error, from: action.type });
     }
   });

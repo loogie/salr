@@ -13,6 +13,9 @@
   {% endif %}
 </head>
 <body>
+  {% if userid != null %}
+  <input type="hidden" id="sessionUser" value="{{userid}}" >
+  {% endif %}
   {% block content %}{% endblock %}
   <script src="js/bundle.js"></script>
 </body>

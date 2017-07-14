@@ -5,6 +5,16 @@ import {Link} from "react-router-dom";
 // Home page component
 class Home extends React.Component {
 
+  constructor(props){
+    super(props);
+
+    let sessionUser = document.getElementById("sessionUser");
+    if (sessionUser)
+    {
+      this.props.dispatch({type:"USER_SESSION", userid: sessionUser.value});
+    }
+  }
+
   logout(){
     this.props.dispatch({type:"USER_LOGOUT"});
   }
@@ -15,16 +25,16 @@ class Home extends React.Component {
     let userDiv = null;
     if (this.props.user.id){
       userDiv = (
-        <div className="flex-row" style={{"alignItems": "stretch", "justifyContent":"center"}>
-          <Link to="/profile">{this.props.user.displayName}</Link>|
-          <button className="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised mdl-button--colored" onClick={()=>this.logout()}>Logout</button>
+        <div className="flex-row" style={{"alignItems": "stretch", "justifyContent":"center"}}>
+          <Link to="/profile">{this.props.user.displayName}</Link>&nbsp;|&nbsp;
+          <a href="" onClick={()=>this.logout()}>Sign&nbsp;Out</a>
         </div>
       )
     }
     else {
       userDiv = (
-        <div className="flex-row" style={{"alignItems": "stretch", "justifyContent":"center"}>
-          <Link to="/login">Login</Link>|
+        <div className="flex-row" style={{"alignItems": "stretch", "justifyContent":"center"}}>
+          <Link to="/login">Login</Link>&nbsp;|&nbsp;
           <Link to="/signup">Signup</Link>
         </div>
       )

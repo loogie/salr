@@ -4,14 +4,33 @@ import {store} from "../store";
 
 // main Map saga generators
 export default function* userSagas() {
+  yield takeEvery("USER_SESSION", sessionLogin);
   yield takeEvery("USER_LOGIN", attemptLogin);
   yield takeEvery("USER_SIGNUP", attemptSignup);
   yield takeEvery("USER_LOGOUT", logout);
 }
 
-function* attemptSignup(action){
+function* sessionLogin(action){
   try{
-    yield call(signup, action);
+    yield call((action)=>{
+      fetch('/api/auth/session/' + action.userid, {method:"POST", credentials: 'include'})
+        .then((response)=>{
+          if (response.status >= 400){
+            console.log("ERROR");
+            console.log(response);
+            store.dispatch({type:"ERROR", error: response, from: action.type});
+          }
+          return response.json();
+        })
+        .then((json)=>{
+          if (json.user){
+            store.dispatch({type:"USER_CONN", user:json.user});
+          }
+          else if (json.error){
+            store.dispatch({type:"ERROR", error: json.error, from: action.type});
+          }
+        });
+    }, action);
   }
   catch(ex){
     yield put({type: "ERROR", error: ex, from: action.type});
@@ -21,6 +40,15 @@ function* attemptSignup(action){
 function* attemptLogin(action){
   try{
     yield call(login, action);
+  }
+  catch(ex){
+    yield put({type: "ERROR", error: ex, from: action.type});
+  }
+}
+
+function* attemptSignup(action){
+  try{
+    yield call(signup, action);
   }
   catch(ex){
     yield put({type: "ERROR", error: ex, from: action.type});
@@ -45,7 +73,7 @@ function signup(action){
   console.log("POSTING PAYLOAD");
   console.log(payload);
 
-  fetch('/api/signup', {method:"POST", body:payload, headers: {"Content-Type": "application/json"}})
+  fetch('/api/signup', {method:"POST", body:payload, credentials: 'include', headers: {"Content-Type": "application/json"}})
     .then((response)=>{
       if (response.status >= 400){
         console.log("ERROR");
@@ -69,7 +97,7 @@ function login(action){
   console.log("POSTING PAYLOAD");
   console.log(payload);
 
-  fetch('/api/auth/local', {method:"POST", body:payload, headers: {"Content-Type": "application/json"}})
+  fetch('/api/auth/local', {method:"POST", body:payload, credentials: 'include', headers: {"Content-Type": "application/json"}})
     .then((response)=>{
       if (response.status >= 400){
         console.log("ERROR");
@@ -83,6 +111,8 @@ function login(action){
         store.dispatch({type:"USER_CONN", user:json.user});
       }
       else if (json.error){
+        console.log("ERROR");
+        console.log(json);
         store.dispatch({type:"ERROR", error: json.error, from: action.type});
       }
     });

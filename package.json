@@ -67,6 +67,7 @@
     "scssify": "^2.3.0",
     "serve-favicon": "^2.4.3",
     "session-file-store": "^1.0.0",
+    "session-rethinkdb": "^2.0.0",
     "supertest": "^3.0.0",
     "thinky": "^2.3.8"
   }

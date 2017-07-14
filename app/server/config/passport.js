@@ -72,8 +72,8 @@ module.exports = function(passport){
   );
 
   passport.use('local-login', new JsonStrategy({
-      usernameField: 'username',
-      passwordField: 'pass',
+      usernameProp: 'username',
+      passwordProp: 'pass',
       passReqToCallback: true
     },(req, username, pass, done)=>{
       console.log("LOGGING IN USER");

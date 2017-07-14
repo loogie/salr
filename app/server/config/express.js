@@ -13,9 +13,20 @@ const passport = require('passport');
 const flash = require('connect-flash');
 
 const session = require('express-session');
-const FileStore = require('session-file-store')(session);
+const RDBStore = require('session-rethinkdb')(session);
 
 require('./passport')(passport);
+
+const r = require('rethinkdbdash')({
+    servers: [
+        {host: 'localhost', port: 28015}
+    ]
+});
+
+const store = new RDBStore(r,  {
+    browserSessionsMaxAge: 5000, // optional, default is 60000 (60 seconds). Time between clearing expired sessions.
+    table: 'session' // optional, default is 'session'. Table to store sessions in.
+});
 
 module.exports = function(app, config) {
   var env = process.env.NODE_ENV || 'development';
@@ -41,10 +52,14 @@ module.exports = function(app, config) {
   app.use(methodOverride());
 
   app.use(session({
-    store: new FileStore(),
-    secret: "sexy keyboard cat",
+    // https://github.com/expressjs/session#options
+    secret: 'keyboard cat',
+    cookie: {
+        maxAge: 10000 // ten seconds, for testing
+    },
+    store: store,
     resave: true,
-    saveUninitialized: false
+    saveUninitialized: true
   }));
   app.use(passport.initialize());
   app.use(passport.session());

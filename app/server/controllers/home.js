@@ -8,6 +8,11 @@ module.exports = function (app) {
   app.use('/*', router);
 };
 
-router.get('/', (req, res)=>{
-  res.render('index', {title:"Salr"});
+router.get('/*', (req, res)=>{
+  let sessionuser = null;
+  if (req.session && req.session.passport){
+    sessionuser = req.session.passport.user;
+  }
+  console.log(sessionuser);
+  res.render('index', {title:"Salr", userid:sessionuser});
 });
