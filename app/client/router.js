@@ -5,6 +5,7 @@ import App from "./components/App";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
+import Profiles from "./components/Profiles";
 import NotFound from "./components/NotFound";
 
 // build the router
@@ -14,6 +15,7 @@ const router = (
       <Route path="/" component={Home} />
       <Route path="/login" component={Login} />
       <Route path="/signup" component={Signup} />
+      <Route path="/profiles/:displayName" component={Profiles} />
     </App>
   </Router>
 );

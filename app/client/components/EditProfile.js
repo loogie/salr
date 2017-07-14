@@ -3,11 +3,11 @@ import {connect} from "react-redux";
 import {Redirect, Link} from "react-router-dom";
 
 // Home page component
-class Login extends React.Component {
+class EditProfile extends React.Component {
   constructor(props){
     super(props);
 
-    this.state = {username:"", pass: "", redirect:false};
+    this.state = {username:"", pass: ""};
   }
 
   onChange(prop, value) {
@@ -18,21 +18,13 @@ class Login extends React.Component {
   }
 
   onSubmit(){
-    this.props.dispatch({type:"USER_LOGIN", user: this.state});
-    this.setState(Object.assign({}, this.state, {redirect:true}));
+    this.props.dispatch({type:"USER_SAVE", user: this.state});
   }
 
   // render
   render() {
-    let redirect = null;
-    if (this.state.redirect){
-      redirect = (<Redirect to="/" />);
-    }
-
     return (
       <div className="center-pg pg-limit-lg flex-col">
-        <h4>Login</h4>
-        {redirect}
         <div className="mdl-textfield mdl-js-textfield fill">
           <input className="mdl-textfield__input" type="text" id="txtName" onChange={(e)=>this.onChange('username', e.target.value)} value={this.state.username} />
           <label className="mdl-textfield__label" htmlFor="txtName">Username...</label>
@@ -43,7 +35,7 @@ class Login extends React.Component {
         </div>
         <div className="flex-row-rev">
           <button className="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised mdl-button--colored" onClick={()=>this.onSubmit()}>
-            Submit
+            Save Edits
           </button>
         </div>
       </div>
@@ -51,4 +43,16 @@ class Login extends React.Component {
   }
 }
 
-export default connect()(Login);
+const mapStateToProps = (state)=>{
+  return {
+    user: state.user
+  }
+}
+
+const mapDispatchToProps = (dispatch)=>{
+  return {
+    dispatch
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditProfile);

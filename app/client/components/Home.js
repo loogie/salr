@@ -16,8 +16,11 @@ class Home extends React.Component {
   }
 
   logout(){
-    this.props.dispatch({type:"USER_LOGOUT"});
+    this.props.dispatch({type:"USER_CLEAR"});
+    //this.props.dispatch({type:"USER_LOGOUT"});
   }
+
+  //<a href="" onClick={()=>this.logout()}>Sign&nbsp;Out</a>
 
   // render
   render() {
@@ -27,7 +30,7 @@ class Home extends React.Component {
       userDiv = (
         <div className="flex-row" style={{"alignItems": "stretch", "justifyContent":"center"}}>
           <Link to="/profile">{this.props.user.displayName}</Link>&nbsp;|&nbsp;
-          <a href="" onClick={()=>this.logout()}>Sign&nbsp;Out</a>
+          <Link to="/logout" onClick={()=>this.logout()}>Sign&nbsp;Out</Link>
         </div>
       )
     }

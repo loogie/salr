@@ -59,7 +59,23 @@ function* logout(action){
   try{
     yield call((action)=>{
       console.log("LOGOUT");
-      fetch('/api/logout', {method:"POST"});
+      fetch('/api/logout', {method:"POST"})
+      .then((response)=>{
+        if (response.status >= 400){
+          console.log("ERROR");
+          console.log(response);
+          store.dispatch({type:"ERROR", error: response, from: action.type});
+        }
+        return response.json();
+      })
+      .then((json)=>{
+        if (json.logout){
+          store.dispatch({type:"USER_CLEAR"});
+        }
+        else if (json.error){
+          store.dispatch({type:"ERROR", error: json.error, from: action.type});
+        }
+      });
       store.dispatch({type:"USER_CLEAR"})
     }, action);
   }

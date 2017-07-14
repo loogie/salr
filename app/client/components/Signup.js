@@ -28,10 +28,6 @@ class Signup extends React.Component {
       userRedirect = (<Redirect to="/" />)
     }
 
-    console.log("USER");
-    console.log(this.props.user);
-    console.log(userRedirect);
-
     return (
       <div className="center-pg pg-limit-lg flex-col">
         <h4>Create New User</h4>

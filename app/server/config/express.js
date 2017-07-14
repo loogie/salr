@@ -55,7 +55,7 @@ module.exports = function(app, config) {
     // https://github.com/expressjs/session#options
     secret: 'keyboard cat',
     cookie: {
-        maxAge: 10000 // ten seconds, for testing
+        maxAge: 7 * 24 * 3600 * 1000 // Week long cookie
     },
     store: store,
     resave: true,

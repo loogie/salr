@@ -14,6 +14,23 @@ router.post('/', (req, res)=>{
   res.send(response);
 });
 
+router.post('/get/users/displayName/:displayName', (req, res)=>{
+  let displayName = req.params.displayName;
+
+  User.filter({displayName}).run().then((users)=>{
+    let user = null;
+    if (users.length > 0){
+      user = makeUserSafe(users[0]);
+    }
+    console.log("sending user");
+    console.log(user)
+    res.send({user});
+  })
+  .catch((err)=>{
+    res.send({error:err});
+  })
+});
+
 router.post('/signup', (req, res)=>{
   passport.authenticate('local-signup', (err, user, info)=>{
     if (err) {return res.send({error:err});}
@@ -27,27 +44,17 @@ router.post('/signup', (req, res)=>{
 
 router.post('/logout', (req, res)=>{
   req.logout();
-  req.session.destroy(function (err) {
-    console.log("BOOP");
-    console.log(err);
-      res.redirect('/'); //Inside a callback… bulletproof!
-  });
+  console.log("LOGGED OUT");
+  console.log(req.user);
+  return res.send({logout:true});
 });
 
 router.post('/auth/session/:userid', (req, res)=>{
   let userid = req.params.userid;
-
-  if (userid == req.session.passport.user){
-    User.filter({id: req.session.passport.user}).run().then((matches)=>{
-      if (matches.length > 0){
-        let user = matches[0];
-        delete user.local.pwd;
-        return res.send({user});
-      }
-    })
-    .catch((err)=>{
-      return res.send({error:err});
-    });
+  if (userid == req.user.id){
+      let user = req.user;
+      delete user.local.pwd;
+      return res.send({user});
   }
 });
 
@@ -63,5 +70,10 @@ router.post('/auth/local', (req, res)=>{
   })(req, res);
 })
 
+function makeUserSafe(user){
+  let newUser = Object.assign({}, user);
+  delete newUser.local.pwd;
+  return newUser;
+}
 
 module.exports = router;
