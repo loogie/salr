@@ -58,7 +58,7 @@ module.exports = function(app, config) {
         maxAge: 7 * 24 * 3600 * 1000 // Week long cookie
     },
     store: store,
-    resave: true,
+    resave: false,
     saveUninitialized: true
   }));
   app.use(passport.initialize());

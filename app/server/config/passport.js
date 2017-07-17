@@ -29,60 +29,50 @@ module.exports = function(passport){
     })
   });
 
-  passport.use('local-signup', new JsonStrategy({
-      usernameProp : 'username',
-      passwordProp : 'pass',
+  passport.use('signup', new JsonStrategy({
+      usernameProp: 'username',
+      passwordProp: 'password',
       passReqToCallback: true
-    },(req, username, pass, done)=>{
-
-      User.filter({local:{name: username}}).run().then((matches)=>{
+    },(req, username, password, done)=>{
+      console.log("SIGNING UP USER");
+      User.filter({local:{name: username }}).run().then((matches)=>{
         if (matches.length > 0){
-          console.log("USERNAME TAKEN");
-          console.log(JSON.stringify(matches));
-          return done("Username is already taken", null);
+          console.log("USERNAME ALREADY FOUND");
+          return done({success:false, message: "username already taken"}, null);
         }
+        else {
+          let newUser = new User({
+            displayName: username,
+            local: {
+              name: username,
+              pwd: generateHash(password)
+            }
+          });
 
-        console.log("CREATING NEW USER");
-        let newUser = new User({
-          displayName: username,
-          local: {
-            name: username,
-            pwd: generateHash(pass),
-            email: req.body.email
-          }
-        });
-
-        console.log("SAVING NEW USER");
-        newUser.saveAll().then((user)=>{
-          console.log("NEW USER SAVED");
-          return done(null, user);
-        })
-        .catch((err)=>{
-          console.log("Error saving new user");
-          console.log(err);
-          return done(err, null);
-        });
-      })
-      .catch((err)=>{
-        console.log("Error searching users");
-        console.log(err);
-        return done(err, null);
+          newUser.saveAll().then((user)=>{
+            console.log("USERNAME CREATED");
+            return done(null, user);
+          }).catch((err)=>{
+            console.log(err);
+            return done({success:false, message: err.message}, null);
+          })
+        }
       })
     })
   );
 
-  passport.use('local-login', new JsonStrategy({
+  passport.use('local', new JsonStrategy({
       usernameProp: 'username',
-      passwordProp: 'pass',
+      passwordProp: 'password',
       passReqToCallback: true
-    },(req, username, pass, done)=>{
+    },(req, username, password, done)=>{
       console.log("LOGGING IN USER");
       User.filter({local:{name: username}}).run().then((matches)=>{
         if (matches.length > 0){
           for (let i = 0; i < matches.length; i++){
             let user = matches[i];
 
-            if (validPassword(user, pass)) {
+            if (validPassword(user, password)) {
               return done(null, user);
             }
           }
