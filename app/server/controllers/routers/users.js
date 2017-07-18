@@ -12,6 +12,17 @@ const validPassword = function(user, password) {
     return bcrypt.compareSync(password, user.local.pwd);
 };
 
+exports.session = (req, res, next)=>{
+  if (req.user){
+    let safeUser = req.user;
+    delete safeUser.local.pwd;
+    return res.json({ success: true, message: "session user found", user:safeUser });
+  }
+  else {
+    return res.json({ success:false, message: "no session user found"});
+  }
+}
+
 exports.login = (req, res, next)=>{
   // Do email and password validation for the server
 	passport.authenticate("local", function(err, user, info) {
@@ -32,14 +43,19 @@ exports.login = (req, res, next)=>{
 			if(loginErr) {
 				return res.json({ success: false, message: loginErr })
 			}
-			return res.json({ success: true, message: "authentication succeeded" })
+
+      let safeUser = user;
+      delete safeUser.local.pwd;
+
+			return res.json({ success: true, message: "authentication succeeded", user:safeUser })
 		})
 	})(req, res, next)
 };
 
 exports.logout = (req, res, next)=>{
+  console.log("LOGOUT");
   req.logout();
-  return res.json({ success: true });
+  next();
 };
 
 

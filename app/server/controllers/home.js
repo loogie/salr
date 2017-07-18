@@ -8,39 +8,17 @@ const generateHash = function(password) {
 };
 
 module.exports = function (app) {
+  app.post('/session', userRoutes.session);
   app.post('/signup', userRoutes.signup);
+  app.post('/login', userRoutes.login);
+  app.post('/logout', userRoutes.logout);
 
   //app.use('/*', userRouter);
   app.use('/*', router);
 };
 
-router.post('/signup', (req, res, next)=>{
-  console.log("TRYING TO CREATE USER");
-  console.log(req);
-  User.filter({local:{name: req.body.username }}).run().then((matches)=>{
-    if (matches.length > 0){
-      console.log("USERNAME ALREADY FOUND");
-      res.send({success:false, message: "username already taken"});
-    }
-    else {
-      let newUser = new User({
-        displayName: req.body.username,
-        local: {
-          name: req.body.username,
-          pwd: generateHash(req.body.password)
-        }
-      });
-
-      newUser.saveAll().then((user)=>{
-        res.send({success:true, message: "signup successful"})
-      }).catch((err)=>{
-        console.log(err);
-        res.send({success:false, message: err.message});
-      })
-    }
-  })
-});
-
 router.get('/*', (req, res)=>{
+  console.log(req.user);
+
   res.render('index', {title:"Salr"});
 });

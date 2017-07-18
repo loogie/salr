@@ -37,8 +37,6 @@ class SignupContainer extends React.Component{
 						state.user = json.user;
 						state.redirect = true;
 
-						console.log("success?");
-
 						this.setState(state);
 						this.props.dispatch({type:"USER_LOGIN", user: json.user});
 	        }
@@ -48,7 +46,7 @@ class SignupContainer extends React.Component{
 	      });
 		}
 		catch(ex){
-			store.dispatch({type:"ERROR", error: ex});
+			this.props.dispatch({type:"ERROR", error: ex});
 		}
 	}
 
